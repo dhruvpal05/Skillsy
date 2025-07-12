@@ -23,7 +23,7 @@ export interface SwapRequest {
   targetUserId: string;
   offeredSkill: string;
   requestedSkill: string;
-  message: string;
+  message?: string;
   status: 'pending' | 'accepted' | 'rejected' | 'completed' | 'cancelled';
   createdAt: string;
   updatedAt: string;

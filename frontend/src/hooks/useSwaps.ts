@@ -1,67 +1,85 @@
-import { useState } from 'react';
-import { SwapRequest } from '../types';
-import { swapService } from '../services/swapService';
+import { useState, useEffect } from 'react';
+import { swapService, SwapRequest, CreateSwapRequestData, UpdateSwapRequestData } from '../services/swapService';
 
 export const useSwaps = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [swapRequests, setSwapRequests] = useState<SwapRequest[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createSwapRequest = async (requestData: Omit<SwapRequest, 'id' | 'createdAt' | 'updatedAt' | 'status'>): Promise<SwapRequest> => {
-    setIsLoading(true);
+  const fetchSwapRequests = async () => {
+    setLoading(true);
     setError(null);
-    
+
+    try {
+      const requests = await swapService.getUserSwapRequests();
+      setSwapRequests(requests);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch swap requests');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createSwapRequest = async (requestData: CreateSwapRequestData): Promise<SwapRequest> => {
+    setLoading(true);
+    setError(null);
+
     try {
       const newRequest = await swapService.createSwapRequest(requestData);
+      setSwapRequests(prev => [newRequest, ...prev]);
       return newRequest;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to create swap request';
-      setError(errorMessage);
+      setError(err instanceof Error ? err.message : 'Failed to create swap request');
       throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const updateSwapRequest = async (id: string, updates: Partial<SwapRequest>): Promise<SwapRequest> => {
-    setIsLoading(true);
+  const updateSwapRequest = async (id: string, updates: UpdateSwapRequestData): Promise<SwapRequest> => {
+    setLoading(true);
     setError(null);
-    
+
     try {
       const updatedRequest = await swapService.updateSwapRequest(id, updates);
+      setSwapRequests(prev =>
+        prev.map(req => req.id === id ? updatedRequest : req)
+      );
       return updatedRequest;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to update swap request';
-      setError(errorMessage);
+      setError(err instanceof Error ? err.message : 'Failed to update swap request');
       throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const getUserSwapRequests = async (userId: string): Promise<SwapRequest[]> => {
-    setIsLoading(true);
+  const deleteSwapRequest = async (id: string): Promise<void> => {
+    setLoading(true);
     setError(null);
-    
+
     try {
-      const requests = await swapService.getUserSwapRequests(userId);
-      return requests;
+      await swapService.deleteSwapRequest(id);
+      setSwapRequests(prev => prev.filter(req => req.id !== id));
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get swap requests';
-      setError(errorMessage);
+      setError(err instanceof Error ? err.message : 'Failed to delete swap request');
       throw err;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const clearError = () => setError(null);
+  useEffect(() => {
+    fetchSwapRequests();
+  }, []);
 
   return {
-    isLoading,
+    swapRequests,
+    loading,
     error,
     createSwapRequest,
     updateSwapRequest,
-    getUserSwapRequests,
-    clearError,
+    deleteSwapRequest,
+    refetch: fetchSwapRequests,
   };
 };

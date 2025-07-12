@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Filter } from 'lucide-react';
-import { SwapRequest } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
-import { useApp } from '../../contexts/AppContext';
+import { useSwaps } from '../../hooks/useSwaps';
 import { Card } from '../../components/common/Card/Card';
 import { Button } from '../../components/common/Button/Button';
 import { SwapRequestCard } from '../../components/swap/SwapRequestCard/SwapRequestCard';
@@ -13,25 +12,31 @@ import styles from './Swaps.module.css';
 export const Swaps: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'pending' | 'accepted' | 'completed' | 'rejected'>('all');
   const { user } = useAuth();
-  const { swapRequests, isLoading, loadUserSwapRequests, updateSwapRequest } = useApp();
+  const { swapRequests, loading, error, updateSwapRequest } = useSwaps();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (user?.id) {
-      loadUserSwapRequests(user.id);
-    }
-  }, [user?.id, loadUserSwapRequests]);
-
   const handleAccept = async (requestId: string) => {
-    await updateSwapRequest(requestId, { status: 'accepted' });
+    try {
+      await updateSwapRequest(requestId, { status: 'accepted' });
+    } catch (error) {
+      console.error('Failed to accept swap request:', error);
+    }
   };
 
   const handleReject = async (requestId: string) => {
-    await updateSwapRequest(requestId, { status: 'rejected' });
+    try {
+      await updateSwapRequest(requestId, { status: 'rejected' });
+    } catch (error) {
+      console.error('Failed to reject swap request:', error);
+    }
   };
 
   const handleCancel = async (requestId: string) => {
-    await updateSwapRequest(requestId, { status: 'cancelled' });
+    try {
+      await updateSwapRequest(requestId, { status: 'cancelled' });
+    } catch (error) {
+      console.error('Failed to cancel swap request:', error);
+    }
   };
 
   const handleAddFeedback = (swapId: string) => {
@@ -55,7 +60,7 @@ export const Swaps: React.FC = () => {
 
   const counts = getFilterCounts();
 
-  if (isLoading) {
+  if (loading && swapRequests.length === 0) {
     return (
       <div className={styles.loading}>
         <LoadingSpinner size="lg" text="Loading your swaps..." />
@@ -72,6 +77,15 @@ export const Swaps: React.FC = () => {
           New Swap
         </Button>
       </div>
+
+      {error && (
+        <div className={styles.error}>
+          <p>Error: {error}</p>
+          <Button variant="secondary" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
+        </div>
+      )}
 
       <Card className={styles.filtersCard}>
         <div className={styles.filters}>
@@ -96,7 +110,7 @@ export const Swaps: React.FC = () => {
           </div>
           <h2>No {filter !== 'all' ? filter : ''} swaps found</h2>
           <p>
-            {filter === 'all' 
+            {filter === 'all'
               ? "You haven't created any swap requests yet."
               : `You don't have any ${filter} swap requests.`
             }

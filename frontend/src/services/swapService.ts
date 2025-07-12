@@ -1,118 +1,52 @@
-import { SwapRequest, ApiResponse } from '../types';
+import { apiClient } from './api';
 
-// Mock data for development
-const MOCK_SWAP_REQUESTS: SwapRequest[] = [
-  {
-    id: '1',
-    requesterId: '1',
-    targetUserId: '2',
-    offeredSkill: 'React',
-    requestedSkill: 'Python',
-    message: 'I would love to learn Python from you while teaching React!',
-    status: 'pending',
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z',
-  },
-  {
-    id: '2',
-    requesterId: '2',
-    targetUserId: '3',
-    offeredSkill: 'Data Science',
-    requestedSkill: 'GraphQL',
-    message: 'Interested in learning GraphQL, can teach data science in return.',
-    status: 'accepted',
-    createdAt: '2024-01-10T14:00:00Z',
-    updatedAt: '2024-01-12T09:00:00Z',
-  },
-];
+export interface SwapRequest {
+  id: string;
+  requesterId: string;
+  targetUserId: string;
+  offeredSkill: string;
+  requestedSkill: string;
+  status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
+  message?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
-/**
- * Service for swap request operations
- */
+export interface CreateSwapRequestData {
+  targetUserId: string;
+  offeredSkill: string;
+  requestedSkill: string;
+  message?: string;
+}
+
+export interface UpdateSwapRequestData {
+  status?: 'accepted' | 'rejected' | 'cancelled';
+  message?: string;
+}
+
 export const swapService = {
-  /**
-   * Create a new swap request
-   */
-  async createSwapRequest(
-    requestData: Omit<SwapRequest, 'id' | 'createdAt' | 'updatedAt' | 'status'>
-  ): Promise<SwapRequest> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const newRequest: SwapRequest = {
-      ...requestData,
-      id: `swap_${Date.now()}`,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    MOCK_SWAP_REQUESTS.push(newRequest);
-    return newRequest;
+  // Create a new swap request
+  async createSwapRequest(requestData: CreateSwapRequestData): Promise<SwapRequest> {
+    return apiClient.createSwapRequest(requestData);
   },
 
-  /**
-   * Update an existing swap request
-   */
-  async updateSwapRequest(id: string, updates: Partial<SwapRequest>): Promise<SwapRequest> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const requestIndex = MOCK_SWAP_REQUESTS.findIndex(req => req.id === id);
-    if (requestIndex === -1) {
-      throw new Error('Swap request not found');
-    }
-
-    const updatedRequest: SwapRequest = {
-      ...MOCK_SWAP_REQUESTS[requestIndex],
-      ...updates,
-      updatedAt: new Date().toISOString(),
-    };
-
-    MOCK_SWAP_REQUESTS[requestIndex] = updatedRequest;
-    return updatedRequest;
+  // Update a swap request
+  async updateSwapRequest(id: string, updates: UpdateSwapRequestData): Promise<SwapRequest> {
+    return apiClient.updateSwapRequest(id, updates);
   },
 
-  /**
-   * Get swap requests for a specific user
-   */
-  async getUserSwapRequests(userId: string): Promise<SwapRequest[]> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    return MOCK_SWAP_REQUESTS.filter(
-      req => req.requesterId === userId || req.targetUserId === userId
-    );
+  // Get user's swap requests
+  async getUserSwapRequests(): Promise<SwapRequest[]> {
+    return apiClient.getUserSwapRequests();
   },
 
-  /**
-   * Get all swap requests (admin only)
-   */
+  // Get all swap requests (for admin)
   async getAllSwapRequests(): Promise<SwapRequest[]> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    return MOCK_SWAP_REQUESTS;
+    return apiClient.getAllSwapRequests();
   },
 
-  /**
-   * Delete a swap request
-   */
-  async deleteSwapRequest(id: string): Promise<ApiResponse<null>> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    const requestIndex = MOCK_SWAP_REQUESTS.findIndex(req => req.id === id);
-    if (requestIndex === -1) {
-      throw new Error('Swap request not found');
-    }
-
-    MOCK_SWAP_REQUESTS.splice(requestIndex, 1);
-
-    return {
-      data: null,
-      success: true,
-      message: 'Swap request deleted successfully',
-    };
+  // Delete a swap request
+  async deleteSwapRequest(id: string): Promise<void> {
+    return apiClient.deleteSwapRequest(id);
   },
 };
