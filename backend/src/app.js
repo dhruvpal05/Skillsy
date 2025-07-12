@@ -14,4 +14,18 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'API is running' });
 });
 
+//routes
+import { userRoutes } from './modules/user/index.js';
+import { skillRoutes } from './modules/skill/index.js';
+import { swapRoutes } from './modules/swap/index.js';
+import { adminRoutes } from './modules/admin/index.js';
+import { feedbackRoutes } from './modules/feedback/index.js';
+
+
+app.use('/api/users', userRoutes);
+app.use('/api/skills', skillRoutes);
+app.use('/api/swaps', swapRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/feedback', feedbackRoutes);
+
 export default app;
