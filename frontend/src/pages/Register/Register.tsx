@@ -59,7 +59,7 @@ export const Register: React.FC = () => {
     <div className={styles.container}>
       <Card className={styles.card}>
         <div className={styles.header}>
-          <h1 className={styles.title}>Join SkillSwap</h1>
+          <h1 className={styles.title}>Join Skillsy</h1>
           <p className={styles.subtitle}>Create your account and start learning</p>
         </div>
 

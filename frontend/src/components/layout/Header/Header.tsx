@@ -22,7 +22,7 @@ export const Header: React.FC = () => {
       <div className={styles.container}>
         <Link to="/" className={styles.logo}>
           <Users size={24} />
-          <span>SkillSwap</span>
+          <span>Skillsy</span>
         </Link>
 
         {/* Desktop Navigation */}

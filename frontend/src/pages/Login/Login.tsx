@@ -32,7 +32,7 @@ export const Login: React.FC = () => {
       <Card className={styles.card}>
         <div className={styles.header}>
           <h1 className={styles.title}>Welcome back</h1>
-          <p className={styles.subtitle}>Sign in to your SkillSwap account</p>
+          <p className={styles.subtitle}>Sign in to your Skillsy account</p>
         </div>
 
         {error && (

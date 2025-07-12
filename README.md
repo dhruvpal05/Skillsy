@@ -1,8 +1,8 @@
-# Skill Swap Platform
+# Skillsy Platform
 
 ## 🧩 Problem Statement
 
-In a world where everyone possesses unique talents and skills, there is often a lack of accessible platforms for peer-to-peer knowledge and skill exchange. The **Skill Swap Platform** is designed to bridge that gap by enabling users to list the skills they can offer and request the ones they wish to learn in return.
+In a world where everyone possesses unique talents and skills, there is often a lack of accessible platforms for peer-to-peer knowledge and skill exchange. The **Skillsy Platform** is designed to bridge that gap by enabling users to list the skills they can offer and request the ones they wish to learn in return.
 
 The platform promotes community-driven learning, encourages mutual growth, and eliminates the need for monetary transactions. Users can manage availability, search others by skill, accept or reject swap offers, and provide feedback post-interaction. An admin panel ensures safety, moderation, and platform integrity.
 
@@ -10,7 +10,7 @@ The platform promotes community-driven learning, encourages mutual growth, and e
 
 ## 📌 Overview
 
-The Skill Swap Platform is a mini-application that allows users to:
+The Skillsy Platform is a mini-application that allows users to:
 - List their own skills
 - Request other skills in return
 - Connect with like-minded learners and professionals
@@ -54,7 +54,7 @@ The Skill Swap Platform is a mini-application that allows users to:
 ## 🖼️ Mockup
 
 View the application mockup here:  
-[Skill Swap Mockup – Excalidraw](https://link.excalidraw.com/l/65VNwvy7c4X/8bM86GXnnUN)
+[Skillsy Mockup – Excalidraw](https://link.excalidraw.com/l/65VNwvy7c4X/8bM86GXnnUN)
 
 ---
 

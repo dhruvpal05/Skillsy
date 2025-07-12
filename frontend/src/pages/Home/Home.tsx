@@ -45,7 +45,7 @@ const testimonials = [
   {
     name: 'Emily Davis',
     role: 'Marketing Specialist',
-    content: 'SkillSwap helped me transition into tech by learning coding from experienced developers.',
+    content: 'Skillsy helped me transition into tech by learning coding from experienced developers.',
     avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop',
   },
 ];
@@ -58,53 +58,54 @@ export const Home: React.FC = () => {
       {/* Hero Section */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>
-            Exchange Skills,
-            <br />
-            <span className={styles.highlight}>Grow Together</span>
-          </h1>
-          <p className={styles.heroSubtitle}>
-            Connect with learners worldwide and swap skills in a collaborative community.
-            Teach what you know, learn what you need.
-          </p>
-          <div className={styles.heroActions}>
-            {isAuthenticated ? (
-              <Link to="/browse">
-                <Button size="lg">
-                  Start Browsing
-                  <ArrowRight size={20} />
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link to="/register">
+          <div className={styles.heroText}>
+            <h1 className={styles.heroTitle}>
+              Exchange Skills,
+              <br />
+              <span className={styles.highlight}>Grow Together</span>
+            </h1>
+            <p className={styles.heroSubtitle}>
+              Connect with learners worldwide and swap skills in a collaborative community.
+              Teach what you know, learn what you need.
+            </p>
+            <div className={styles.heroActions}>
+              {isAuthenticated ? (
+                <Link to="/browse">
                   <Button size="lg">
-                    Get Started Free
-                    <ArrowRight size={20} />
+                    Start Browsing
+                    <ArrowRight size={16} />
                   </Button>
                 </Link>
-                <Link to="/login">
-                  <Button variant="ghost" size="lg">
-                    Sign In
-                  </Button>
-                </Link>
-              </>
-            )}
+              ) : (
+                <>
+                  <Link to="/register">
+                    <Button size="lg">
+                      Get Started Free
+                    </Button>
+                  </Link>
+                  <Link to="/login">
+                    <Button variant="ghost" size="lg">
+                      Sign In
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-        <div className={styles.heroImage}>
-          <img
-            src="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop"
-            alt="People collaborating and learning together"
-            className={styles.heroImg}
-          />
+          <div className={styles.heroImage}>
+            <img
+              src="https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=600&h=400&fit=crop"
+              alt="People collaborating and learning together in a modern workspace"
+              className={styles.heroImg}
+            />
+          </div>
         </div>
       </section>
 
       {/* Features Section */}
       <section className={styles.features}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Why Choose SkillSwap?</h2>
+          <h2 className={styles.sectionTitle}>Why Choose Skillsy?</h2>
           <p className={styles.sectionSubtitle}>
             Join thousands of learners who are already growing their skills through our platform
           </p>
@@ -183,7 +184,7 @@ export const Home: React.FC = () => {
               <Link to="/register">
                 <Button size="lg">
                   Create Account
-                  <ArrowRight size={20} />
+                  <ArrowRight size={16} />
                 </Button>
               </Link>
             </div>

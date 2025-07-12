@@ -1,4 +1,4 @@
-# SkillSwap Platform
+# Skillsy Platform
 
 A modern, full-featured skill exchange platform built with React, TypeScript, and Tailwind CSS. Users can list skills they offer, request skills in return, and manage skill swap requests with a comprehensive rating and feedback system.
 

@@ -2,7 +2,7 @@
  * Application constants and configuration
  */
 
-export const APP_NAME = 'SkillSwap';
+export const APP_NAME = 'Skillsy';
 
 export const ROUTES = {
   HOME: '/',

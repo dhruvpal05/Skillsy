@@ -1,4 +1,4 @@
-// Core type definitions for the Skill Swap Platform
+// Core type definitions for the Skillsy Platform
 
 export interface User {
   id: string;
