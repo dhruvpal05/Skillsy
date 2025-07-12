@@ -1,59 +1,78 @@
 import { useState, useEffect } from 'react';
-import { User, SearchFilters, PaginatedResponse } from '../types';
-import { userService } from '../services/userService';
+import { userService, UserFilters, PaginatedUsersResponse } from '../services/userService';
+import { User } from '../types';
 
-export const useUsers = () => {
+export const useUsers = (filters: UserFilters = {}) => {
   const [users, setUsers] = useState<User[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalUsers, setTotalUsers] = useState(0);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    page: 1,
+    limit: 12,
+    totalPages: 0,
+  });
 
-  const searchUsers = async (filters: SearchFilters): Promise<PaginatedResponse<User>> => {
-    setIsLoading(true);
+  const fetchUsers = async () => {
+    setLoading(true);
     setError(null);
-    
+
     try {
-      const response = await userService.searchUsers(filters);
+      const response: PaginatedUsersResponse = await userService.searchUsers({
+        page: 1,
+        limit: 12,
+        ...filters,
+      });
+
       setUsers(response.data);
-      setTotalPages(response.totalPages);
-      setTotalUsers(response.total);
-      return response;
+      setPagination({
+        total: response.total,
+        page: response.page,
+        limit: response.limit,
+        totalPages: response.totalPages,
+      });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to search users';
-      setError(errorMessage);
-      throw err;
+      setError(err instanceof Error ? err.message : 'Failed to fetch users');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const getUserById = async (id: string): Promise<User | null> => {
-    setIsLoading(true);
-    setError(null);
-    
+  const loadMore = async () => {
+    if (pagination.page >= pagination.totalPages) return;
+
+    setLoading(true);
     try {
-      const user = await userService.getUserById(id);
-      return user;
+      const response: PaginatedUsersResponse = await userService.searchUsers({
+        ...filters,
+        page: pagination.page + 1,
+        limit: pagination.limit,
+      });
+
+      setUsers(prev => [...prev, ...response.data]);
+      setPagination(prev => ({
+        ...prev,
+        page: response.page,
+        total: response.total,
+        totalPages: response.totalPages,
+      }));
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to get user';
-      setError(errorMessage);
-      return null;
+      setError(err instanceof Error ? err.message : 'Failed to load more users');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const clearError = () => setError(null);
+  useEffect(() => {
+    fetchUsers();
+  }, [filters.skill, filters.location, filters.availability]);
 
   return {
     users,
-    isLoading,
+    loading,
     error,
-    totalPages,
-    totalUsers,
-    searchUsers,
-    getUserById,
-    clearError,
+    pagination,
+    refetch: fetchUsers,
+    loadMore,
   };
 };

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { User, AuthState } from '../types';
+import { apiClient } from '../services/api';
 
 type AuthAction =
   | { type: 'LOGIN_START' }
@@ -61,27 +62,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string) => {
     dispatch({ type: 'LOGIN_START' });
     try {
-      // Mock API call - replace with actual authentication
-      const mockUser: User = {
-        id: '1',
-        email,
-        name: 'John Doe',
-        location: 'San Francisco, CA',
-        skillsOffered: ['React', 'TypeScript'],
-        skillsWanted: ['Node.js', 'Python'],
-        availability: 'available',
-        isPublic: true,
-        rating: 4.8,
-        totalSwaps: 15,
-        joinedDate: '2023-01-15',
-        lastActive: new Date().toISOString(),
-      };
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      dispatch({ type: 'LOGIN_SUCCESS', payload: mockUser });
-      localStorage.setItem('authToken', 'mock-token');
+      const response = await apiClient.login(email, password);
+      dispatch({ type: 'LOGIN_SUCCESS', payload: response.data.user });
+      localStorage.setItem('authToken', response.data.token);
     } catch (error) {
       dispatch({ type: 'LOGIN_FAILURE' });
       throw error;
@@ -91,26 +74,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const register = async (userData: Partial<User> & { email: string; password: string }) => {
     dispatch({ type: 'LOGIN_START' });
     try {
-      // Mock API call
-      const newUser: User = {
-        id: Date.now().toString(),
-        email: userData.email,
-        name: userData.name || '',
-        location: userData.location || '',
-        skillsOffered: userData.skillsOffered || [],
-        skillsWanted: userData.skillsWanted || [],
-        availability: 'available',
-        isPublic: true,
-        rating: 0,
-        totalSwaps: 0,
-        joinedDate: new Date().toISOString(),
-        lastActive: new Date().toISOString(),
-      };
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      dispatch({ type: 'LOGIN_SUCCESS', payload: newUser });
-      localStorage.setItem('authToken', 'mock-token');
+      const response = await apiClient.register(userData);
+      dispatch({ type: 'LOGIN_SUCCESS', payload: response.data.user });
+      localStorage.setItem('authToken', response.data.token);
     } catch (error) {
       dispatch({ type: 'LOGIN_FAILURE' });
       throw error;
@@ -124,9 +90,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const updateProfile = async (updates: Partial<User>) => {
     try {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      dispatch({ type: 'UPDATE_PROFILE', payload: updates });
+      const response = await apiClient.updateUserProfile(updates);
+      dispatch({ type: 'UPDATE_PROFILE', payload: response.data });
     } catch (error) {
       throw error;
     }
