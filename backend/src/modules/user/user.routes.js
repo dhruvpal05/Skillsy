@@ -7,9 +7,11 @@ import {
   logoutUser,
   searchUsers,
   getUserById,
-  getUserFeedback
+  getUserFeedback,
+  updateProfilePhoto
 } from './user.controller.js';
 import { protect } from '../../middlewares/auth.middleware.js';
+import upload from '../../middlewares/upload.middleware.js';
 
 const router = express.Router();
 
@@ -23,8 +25,10 @@ router.get('/search', searchUsers);
 
 // Protected Routes
 router.route('/profile')
-  .get(protect, getCurrentUserProfile)
-  .put(protect, updateUserProfile);
+.get(protect, getCurrentUserProfile)
+.put(protect, updateUserProfile);
+
+router.put('/profile/photo', protect, upload.single('profilePhoto'), updateProfilePhoto);
 
 // Get user by ID (public)
 router.get('/:id', getUserById);
