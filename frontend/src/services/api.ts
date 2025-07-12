@@ -80,7 +80,7 @@ class ApiClient {
         });
 
         const response = await this.request(`/users/search?${params.toString()}`);
-        return response.data;
+        return response.data as PaginatedResponse<any>;
     }
 
     async getUserById(id: string): Promise<any> {
@@ -102,7 +102,7 @@ class ApiClient {
 
     async getUserFeedback(userId: string): Promise<any[]> {
         const response = await this.request(`/users/${userId}/feedback`);
-        return response.data;
+        return response.data as any[];
     }
 
     // Swap endpoints
@@ -124,12 +124,12 @@ class ApiClient {
 
     async getUserSwapRequests(): Promise<any[]> {
         const response = await this.request('/swaps/user');
-        return response.data;
+        return response.data as any[];
     }
 
     async getAllSwapRequests(): Promise<any[]> {
         const response = await this.request('/swaps/all');
-        return response.data;
+        return response.data as any[];
     }
 
     async deleteSwapRequest(id: string): Promise<ApiResponse<null>> {

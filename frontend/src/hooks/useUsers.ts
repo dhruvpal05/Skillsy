@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { userService, UserFilters, PaginatedUsersResponse } from '../services/userService';
 import { User } from '../types';
 
@@ -13,7 +13,7 @@ export const useUsers = (filters: UserFilters = {}) => {
     totalPages: 0,
   });
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -36,7 +36,7 @@ export const useUsers = (filters: UserFilters = {}) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
   const loadMore = async () => {
     if (pagination.page >= pagination.totalPages) return;
@@ -65,7 +65,7 @@ export const useUsers = (filters: UserFilters = {}) => {
 
   useEffect(() => {
     fetchUsers();
-  }, [filters.skill, filters.location, filters.availability]);
+  }, [fetchUsers]);
 
   return {
     users,

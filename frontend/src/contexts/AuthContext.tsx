@@ -89,12 +89,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const updateProfile = async (updates: Partial<User>) => {
-    try {
-      const response = await apiClient.updateUserProfile(updates);
-      dispatch({ type: 'UPDATE_PROFILE', payload: response.data });
-    } catch (error) {
-      throw error;
-    }
+    const response = await apiClient.updateUserProfile(updates);
+    dispatch({ type: 'UPDATE_PROFILE', payload: response.data });
   };
 
   return (

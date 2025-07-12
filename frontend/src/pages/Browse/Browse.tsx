@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, MapPin } from 'lucide-react';
-import { User } from '../../types';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUsers } from '../../hooks/useUsers';
 import { Input } from '../../components/common/Input/Input';
 import { Button } from '../../components/common/Button/Button';
 import { Card } from '../../components/common/Card/Card';
 import { UserCard } from '../../components/user/UserCard/UserCard';
-import { Pagination } from '../../components/common/Pagination/Pagination';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner/LoadingSpinner';
 import styles from './Browse.module.css';
 

@@ -93,7 +93,7 @@ export const Swaps: React.FC = () => {
             {Object.entries(counts).map(([key, count]) => (
               <button
                 key={key}
-                onClick={() => setFilter(key as any)}
+                onClick={() => setFilter(key as 'all' | 'pending' | 'accepted' | 'completed' | 'rejected')}
                 className={`${styles.filterTab} ${filter === key ? styles.active : ''}`}
               >
                 {key.charAt(0).toUpperCase() + key.slice(1)} ({count})
