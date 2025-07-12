@@ -21,11 +21,22 @@ import { swapRoutes } from './modules/swap/index.js';
 import { adminRoutes } from './modules/admin/index.js';
 import { feedbackRoutes } from './modules/feedback/index.js';
 
+// Auth routes (frontend expects /auth/*)
+app.use('/api/auth', userRoutes);
 
+// User routes (frontend expects /users/*)
 app.use('/api/users', userRoutes);
-app.use('/api/skills', skillRoutes);
+
+// Swap routes (frontend expects /swaps/*)
 app.use('/api/swaps', swapRoutes);
+
+// Skill routes
+app.use('/api/skills', skillRoutes);
+
+// Admin routes
 app.use('/api/admin', adminRoutes);
+
+// Feedback routes
 app.use('/api/feedback', feedbackRoutes);
 
 export default app;

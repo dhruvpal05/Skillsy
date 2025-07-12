@@ -1,4 +1,12 @@
-import { registerUserService, loginUserService, updateUserProfileService, getUserProfileService } from './user.service.js';
+import {
+  registerUserService,
+  loginUserService,
+  updateUserProfileService,
+  getUserProfileService,
+  searchUsersService,
+  getUserByIdService,
+  getUserFeedbackService
+} from './user.service.js';
 import { successResponse, errorResponse } from '../../utils/response.js';
 
 export const registerUser = async (req, res) => {
@@ -43,4 +51,51 @@ export const updateUserProfile = async (req, res) => {
 // A server-side implementation could involve token blocklisting if needed.
 export const logoutUser = (req, res) => {
   successResponse(res, null, "Logout successful. Please clear token on client-side.");
+};
+
+// Search users with filters and pagination
+export const searchUsers = async (req, res) => {
+  try {
+    const { skill, location, availability, page = 1, limit = 12 } = req.query;
+
+    const filters = {
+      skill: skill || null,
+      location: location || null,
+      availability: availability || null,
+      page: parseInt(page),
+      limit: parseInt(limit)
+    };
+
+    const result = await searchUsersService(filters);
+    return successResponse(res, result);
+  } catch (error) {
+    return errorResponse(res, error, 400);
+  }
+};
+
+// Get user by ID
+export const getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await getUserByIdService(id);
+
+    if (!user) {
+      return errorResponse(res, { message: 'User not found' }, 404);
+    }
+
+    return successResponse(res, user);
+  } catch (error) {
+    return errorResponse(res, error, 400);
+  }
+};
+
+// Get user feedback
+export const getUserFeedback = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const feedback = await getUserFeedbackService(id);
+    return successResponse(res, feedback);
+  } catch (error) {
+    return errorResponse(res, error, 400);
+  }
 };

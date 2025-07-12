@@ -1,5 +1,6 @@
 import User from './user.model.js';
 import jwt from 'jsonwebtoken';
+import Feedback from '../feedback/feedback.model.js';
 
 // Function to generate a JWT
 const generateToken = (id) => {
@@ -7,7 +8,6 @@ const generateToken = (id) => {
     expiresIn: '30d',
   });
 };
-
 
 export const registerUserService = async (userData) => {
   // Expect userData.password, hash it and store as passwordHash
@@ -21,7 +21,6 @@ export const registerUserService = async (userData) => {
   return { user, token };
 };
 
-
 export const loginUserService = async (email, password) => {
   const user = await User.findOne({ email }).select('+passwordHash');
   if (user && (await user.comparePassword(password))) {
@@ -33,10 +32,72 @@ export const loginUserService = async (email, password) => {
 
 export const updateUserProfileService = async (userId, updateData) => {
   // Ensure sensitive data like password is not updated here
-  const allowedUpdates = { name: updateData.name, location: updateData.location, availability: updateData.availability, isPublic: updateData.isPublic };
+  const allowedUpdates = {
+    name: updateData.name,
+    location: updateData.location,
+    availability: updateData.availability,
+    isPublic: updateData.isPublic,
+    skillsOffered: updateData.skillsOffered,
+    skillsWanted: updateData.skillsWanted,
+    profilePhoto: updateData.profilePhoto
+  };
   return await User.findByIdAndUpdate(userId, allowedUpdates, { new: true });
 };
 
 export const getUserProfileService = async (userId) => {
   return await User.findById(userId);
+};
+
+// Search users with filters and pagination
+export const searchUsersService = async (filters) => {
+  const { skill, location, availability, page, limit } = filters;
+
+  let query = { isPublic: true, isBanned: { $ne: true } };
+
+  // Apply skill filter
+  if (skill) {
+    const skillRegex = new RegExp(skill, 'i');
+    query.$or = [
+      { skillsOffered: { $in: [skillRegex] } },
+      { skillsWanted: { $in: [skillRegex] } }
+    ];
+  }
+
+  // Apply location filter
+  if (location) {
+    query.location = new RegExp(location, 'i');
+  }
+
+  // Apply availability filter
+  if (availability && availability !== 'all') {
+    query.availability = availability;
+  }
+
+  const skip = (page - 1) * limit;
+  const users = await User.find(query)
+    .skip(skip)
+    .limit(limit)
+    .sort({ lastActive: -1 });
+
+  const total = await User.countDocuments(query);
+  const totalPages = Math.ceil(total / limit);
+
+  return {
+    data: users,
+    total,
+    page,
+    limit,
+    totalPages,
+  };
+};
+
+// Get user by ID
+export const getUserByIdService = async (userId) => {
+  return await User.findById(userId);
+};
+
+// Get user feedback
+export const getUserFeedbackService = async (userId) => {
+  return await Feedback.find({ toUserId: userId })
+    .sort({ createdAt: -1 });
 };

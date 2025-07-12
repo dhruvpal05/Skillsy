@@ -1,12 +1,12 @@
 import { body } from 'express-validator';
 
 export const swapValidation = [
-  body('recipient').notEmpty().withMessage('Recipient is required'),
-  body('skillOffered').notEmpty().withMessage('Skill offered is required'),
-  body('skillRequested').notEmpty().withMessage('Skill requested is required'),
+  body('targetUserId').notEmpty().withMessage('Target user ID is required'),
+  body('offeredSkill').notEmpty().withMessage('Offered skill is required'),
+  body('requestedSkill').notEmpty().withMessage('Requested skill is required'),
   body('message').optional().isString()
 ];
 
 export const swapStatusValidation = [
-  body('status').isIn(['accepted', 'rejected']).withMessage('Status must be accepted or rejected')
+  body('status').isIn(['accepted', 'rejected', 'completed', 'cancelled']).withMessage('Status must be accepted, rejected, completed, or cancelled')
 ];
