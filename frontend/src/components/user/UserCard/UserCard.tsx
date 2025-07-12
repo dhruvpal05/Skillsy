@@ -33,7 +33,8 @@ export const UserCard: React.FC<UserCardProps> = ({
     }
   };
 
-  const formatAvailability = (availability: string) => {
+  const formatAvailability = (availability?: string) => {
+    if (!availability) return "Unknown";
     return availability.charAt(0).toUpperCase() + availability.slice(1);
   };
 

@@ -43,7 +43,9 @@ export const getCurrentUserProfile = async (req, res) => {
 export const updateUserProfile = async (req, res) => {
   try {
     const updatedUser = await updateUserProfileService(req.user.id, req.body);
-    return successResponse(res, updatedUser, "Profile updated successfully");
+    // Convert to plain object and include virtuals
+    const userObj = updatedUser.toObject({ virtuals: true });
+    return successResponse(res, userObj, "Profile updated successfully");
   } catch (error) {
     return errorResponse(res, error, 400);
   }
