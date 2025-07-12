@@ -6,24 +6,29 @@ export const createSwapRequest = async (data) => {
 
 export const getSwapRequests = async (filter = {}) => {
   return await SwapRequest.find(filter)
-    .populate('requester', 'name email')
-    .populate('recipient', 'name email')
-    .populate('skillOffered', 'name')
-    .populate('skillRequested', 'name');
+    .sort({ createdAt: -1 });
 };
 
 export const getSwapRequestById = async (id) => {
-  return await SwapRequest.findById(id)
-    .populate('requester', 'name email')
-    .populate('recipient', 'name email')
-    .populate('skillOffered', 'name')
-    .populate('skillRequested', 'name');
+  return await SwapRequest.findById(id);
 };
 
 export const updateSwapRequestStatus = async (id, status) => {
+  const updateData = { status };
+  if (status === 'completed') {
+    updateData.completedAt = new Date();
+  }
   return await SwapRequest.findByIdAndUpdate(
     id,
-    { status },
+    updateData,
+    { new: true }
+  );
+};
+
+export const updateSwapRequestById = async (id, updates) => {
+  return await SwapRequest.findByIdAndUpdate(
+    id,
+    { ...updates, updatedAt: new Date() },
     { new: true }
   );
 };
@@ -32,7 +37,7 @@ export const deleteSwapRequest = async (id, userId) => {
   // Only allow deletion if the requester is the current user and status is pending
   return await SwapRequest.findOneAndDelete({
     _id: id,
-    requester: userId,
+    requesterId: userId,
     status: 'pending'
   });
 };
