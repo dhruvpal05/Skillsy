@@ -1,5 +1,7 @@
 import { registerUserService, loginUserService, updateUserProfileService, getUserProfileService } from './user.service.js';
 import { successResponse, errorResponse } from '../../utils/response.js';
+import cloudinary from '../../config/cloudinary.js';
+
 
 export const registerUser = async (req, res) => {
   try {
@@ -43,4 +45,25 @@ export const updateUserProfile = async (req, res) => {
 // A server-side implementation could involve token blocklisting if needed.
 export const logoutUser = (req, res) => {
   successResponse(res, null, "Logout successful. Please clear token on client-side.");
+};
+
+export const updateProfilePhoto = async (req, res) => {
+  try {
+    if (!req.file) return errorResponse(res, 'No file uploaded', 400);
+
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload_stream(
+      { resource_type: 'image', folder: 'profile_photos' },
+      async (error, result) => {
+        if (error) return errorResponse(res, error, 500);
+
+        // Save the URL to the user
+        const updatedUser = await updateUserProfileService(req.user.id, { profilePhoto: result.secure_url });
+        return successResponse(res, updatedUser, 'Profile photo updated');
+      }
+    );
+    result.end(req.file.buffer);
+  } catch (error) {
+    return errorResponse(res, error, 500);
+  }
 };

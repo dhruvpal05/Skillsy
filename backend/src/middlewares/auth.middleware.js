@@ -12,6 +12,7 @@ export const protect = async (req, res, next) => {
       req.user = await User.findById(decoded.id).select('-password');
       next();
     } catch (error) {
+      console.error('JWT error:', error); // Add this line
       return errorResponse(res, 'Not authorized, token failed', 401);
     }
   }
