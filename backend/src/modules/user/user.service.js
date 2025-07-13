@@ -1,6 +1,7 @@
 import User from './user.model.js';
 import jwt from 'jsonwebtoken';
 import Feedback from '../feedback/feedback.model.js';
+import Skill from '../skill/skill.model.js';
 
 // Function to generate a JWT
 const generateToken = (id) => {
@@ -41,6 +42,22 @@ export const updateUserProfileService = async (userId, updateData) => {
     skillsWanted: updateData.skillsWanted,
     profilePhoto: updateData.profilePhoto
   };
+
+  // Add new skills to the global skills collection if they don't exist
+  const allSkills = [
+    ...(Array.isArray(updateData.skillsOffered) ? updateData.skillsOffered : []),
+    ...(Array.isArray(updateData.skillsWanted) ? updateData.skillsWanted : [])
+  ];
+  for (const skillName of allSkills) {
+    if (skillName && typeof skillName === 'string') {
+      await Skill.findOneAndUpdate(
+        { name: skillName.trim() },
+        { name: skillName.trim() },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+    }
+  }
+
   return await User.findByIdAndUpdate(userId, allowedUpdates, { new: true });
 };
 

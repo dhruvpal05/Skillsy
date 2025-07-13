@@ -6,7 +6,10 @@ import morgan from 'morgan';
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
 app.use(helmet());
 app.use(morgan('dev'));
 
@@ -21,8 +24,6 @@ import { swapRoutes } from './modules/swap/index.js';
 import { adminRoutes } from './modules/admin/index.js';
 import { feedbackRoutes } from './modules/feedback/index.js';
 
-// Auth routes (frontend expects /auth/*)
-app.use('/api/auth', userRoutes);
 
 // User routes (frontend expects /users/*)
 app.use('/api/users', userRoutes);

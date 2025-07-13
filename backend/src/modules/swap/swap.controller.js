@@ -6,6 +6,7 @@ import {
   deleteSwapRequest
 } from './swap.service.js';
 import { successResponse, errorResponse } from '../../utils/response.js';
+import User from '../user/user.model.js';
 
 export const sendSwapRequest = async (req, res) => {
   try {
@@ -42,7 +43,8 @@ export const createSwapRequestController = async (req, res) => {
 
 export const getMySwapRequests = async (req, res) => {
   try {
-    const swaps = await getSwapRequests({ requesterId: req.user.id });
+    let swaps = await getSwapRequests({ requesterId: req.user.id });
+    swaps = await attachUserDetailsToSwaps(swaps);
     return successResponse(res, swaps);
   } catch (error) {
     return errorResponse(res, error, 400);
@@ -51,7 +53,8 @@ export const getMySwapRequests = async (req, res) => {
 
 export const getSwapRequestsForMe = async (req, res) => {
   try {
-    const swaps = await getSwapRequests({ targetUserId: req.user.id });
+    let swaps = await getSwapRequests({ targetUserId: req.user.id });
+    swaps = await attachUserDetailsToSwaps(swaps);
     return successResponse(res, swaps);
   } catch (error) {
     return errorResponse(res, error, 400);
@@ -61,9 +64,10 @@ export const getSwapRequestsForMe = async (req, res) => {
 // Get user's swap requests
 export const getUserSwapRequests = async (req, res) => {
   try {
-    const swaps = await getSwapRequests({
+    let swaps = await getSwapRequests({
       $or: [{ requesterId: req.user.id }, { targetUserId: req.user.id }]
     });
+    swaps = await attachUserDetailsToSwaps(swaps);
     return successResponse(res, swaps);
   } catch (error) {
     return errorResponse(res, error, 400);
@@ -73,21 +77,45 @@ export const getUserSwapRequests = async (req, res) => {
 // Get all swap requests (admin only)
 export const getAllSwapRequests = async (req, res) => {
   try {
-    const swaps = await getSwapRequests({});
+    let swaps = await getSwapRequests({});
+    swaps = await attachUserDetailsToSwaps(swaps);
     return successResponse(res, swaps);
   } catch (error) {
     return errorResponse(res, error, 400);
   }
 };
+// Helper to attach user details to swap requests
+async function attachUserDetailsToSwaps(swaps) {
+  const userIds = Array.from(new Set(swaps.flatMap(s => [s.requesterId, s.targetUserId])));
+  const users = await User.find({ _id: { $in: userIds } });
+  const userMap = {};
+  users.forEach(u => { userMap[u._id.toString()] = u.toObject(); });
+  return swaps.map(swap => ({
+    ...swap.toObject(),
+    requester: userMap[swap.requesterId] || null,
+    targetUser: userMap[swap.targetUserId] || null
+  }));
+}
 
 export const respondToSwapRequest = async (req, res) => {
   try {
     const { status } = req.body;
-    if (!['accepted', 'rejected'].includes(status)) {
+    if (!['accepted', 'rejected', 'completed', 'cancelled'].includes(status)) {
       return errorResponse(res, 'Invalid status', 400);
     }
     const swap = await updateSwapRequestStatus(req.params.id, status);
     if (!swap) return errorResponse(res, 'Swap request not found', 404);
+
+    // If completed, increment totalSwaps for both users
+    if (status === 'completed') {
+      try {
+        await User.updateOne({ _id: swap.requesterId }, { $inc: { totalSwaps: 1 } });
+        await User.updateOne({ _id: swap.targetUserId }, { $inc: { totalSwaps: 1 } });
+      } catch (err) {
+        // Log but don't block response
+        console.error('Failed to increment totalSwaps:', err);
+      }
+    }
     return successResponse(res, swap, `Swap request ${status}`);
   } catch (error) {
     return errorResponse(res, error, 400);

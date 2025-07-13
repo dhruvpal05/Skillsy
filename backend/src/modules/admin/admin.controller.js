@@ -46,7 +46,16 @@ export const handleSendPlatformMessage = async (req, res) => {
 export const getAllAdminActions = async (req, res) => {
   try {
     const actions = await getAdminActions();
-    return successResponse(res, actions);
+    // Safely serialize createdAt/updatedAt fields to avoid toISOString errors
+    const safeActions = actions.map(action => {
+      const obj = action.toObject ? action.toObject() : action;
+      return {
+        ...obj,
+        createdAt: obj.createdAt ? obj.createdAt.toISOString() : null,
+        updatedAt: obj.updatedAt ? obj.updatedAt.toISOString() : null,
+      };
+    });
+    return successResponse(res, safeActions);
   } catch (error) {
     return errorResponse(res, error, 400);
   }

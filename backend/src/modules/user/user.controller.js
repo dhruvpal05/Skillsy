@@ -26,6 +26,12 @@ export const loginUser = async (req, res) => {
     const { user, token } = await loginUserService(email, password);
     return successResponse(res, { user, token }, "Login successful");
   } catch (error) {
+    // Log detailed error for debugging
+    console.error('Login error:', {
+      email: req.body.email,
+      error: error.message,
+      stack: error.stack
+    });
     return errorResponse(res, error, 401);
   }
 };

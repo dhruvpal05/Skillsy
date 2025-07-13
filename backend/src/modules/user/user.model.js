@@ -22,12 +22,6 @@ const userSchema = new mongoose.Schema({
   lastActive: { type: Date, default: Date.now },
 }, { timestamps: true });
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('passwordHash')) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.passwordHash = await bcrypt.hash(this.passwordHash, salt);
-  next();
-});
 
 // Method to compare entered password with the hashed password
 userSchema.methods.comparePassword = async function (enteredPassword) {
