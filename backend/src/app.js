@@ -7,7 +7,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin: 'https://skillsy-1.onrender.com',
+    origin: process.env.CORS_ORIGIN || '*', // Use environment variable or default to '*'
     credentials: true
 }));
 app.use(helmet());
