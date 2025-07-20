@@ -7,7 +7,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || '*', // Use environment variable or default to '*'
+    origin: process.env.CORS_ORIGIN, // Use environment variable or default to '*'
     credentials: true
 }));
 app.use(helmet());
