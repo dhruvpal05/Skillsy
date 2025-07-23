@@ -73,6 +73,3 @@ View the application mockup here:
   Email: [dakshyachauhan2515@gmail.com](mailto:dakshyachauhan2515@gmail.com)
 
 ---
-
-## Video Walkthrough
-[Link](https://www.loom.com/share/9b293637fcac406d95ecdf924c7f52e9?sid=829cf757-f9d6-449a-a11f-51fd2692f888)
