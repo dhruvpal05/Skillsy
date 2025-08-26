@@ -1,7 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
 
 const app = express();
 
@@ -10,8 +8,7 @@ app.use(cors({
     origin:"https://skillsy-1.onrender.com", // Use environment variable or default to '*'
     credentials: true
 }));
-app.use(helmet());
-app.use(morgan('dev'));
+
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'API is running' });
