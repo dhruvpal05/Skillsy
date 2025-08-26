@@ -6,11 +6,15 @@ export const createSwapRequest = async (data) => {
 
 export const getSwapRequests = async (filter = {}) => {
   return await SwapRequest.find(filter)
+    .populate('offeredSkill')
+    .populate('requestedSkill')
     .sort({ createdAt: -1 });
 };
 
 export const getSwapRequestById = async (id) => {
-  return await SwapRequest.findById(id);
+  return await SwapRequest.findById(id)
+    .populate('offeredSkill')
+    .populate('requestedSkill');
 };
 
 export const updateSwapRequestStatus = async (id, status) => {
@@ -22,7 +26,9 @@ export const updateSwapRequestStatus = async (id, status) => {
     id,
     updateData,
     { new: true }
-  );
+  )
+    .populate('offeredSkill')
+    .populate('requestedSkill');
 };
 
 export const updateSwapRequestById = async (id, updates) => {
@@ -30,7 +36,9 @@ export const updateSwapRequestById = async (id, updates) => {
     id,
     { ...updates, updatedAt: new Date() },
     { new: true }
-  );
+  )
+    .populate('offeredSkill')
+    .populate('requestedSkill');
 };
 
 export const deleteSwapRequest = async (id, userId) => {
@@ -39,5 +47,7 @@ export const deleteSwapRequest = async (id, userId) => {
     _id: id,
     requesterId: userId,
     status: 'pending'
-  });
+  })
+    .populate('offeredSkill')
+    .populate('requestedSkill');
 };

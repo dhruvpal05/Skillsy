@@ -38,50 +38,37 @@ export const updateUserProfileService = async (userId, updateData) => {
     location: updateData.location,
     availability: updateData.availability,
     isPublic: updateData.isPublic,
-    skillsOffered: updateData.skillsOffered,
-    skillsWanted: updateData.skillsWanted,
+    skillsOffered: updateData.skillsOffered, // should be array of ObjectIds
+    skillsWanted: updateData.skillsWanted,   // should be array of ObjectIds
     profilePhoto: updateData.profilePhoto
   };
 
-  // Add new skills to the global skills collection if they don't exist
-  const allSkills = [
-    ...(Array.isArray(updateData.skillsOffered) ? updateData.skillsOffered : []),
-    ...(Array.isArray(updateData.skillsWanted) ? updateData.skillsWanted : [])
-  ];
-  for (const skillName of allSkills) {
-    if (skillName && typeof skillName === 'string') {
-      await Skill.findOneAndUpdate(
-        { name: skillName.trim() },
-        { name: skillName.trim() },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
-      );
-    }
-  }
-
-  return await User.findByIdAndUpdate(userId, allowedUpdates, { new: true });
+  return await User.findByIdAndUpdate(userId, allowedUpdates, { new: true })
+    .populate('skillsOffered')
+    .populate('skillsWanted');
 };
 
 export const getUserProfileService = async (userId) => {
-  return await User.findById(userId);
+  return await User.findById(userId)
+    .populate('skillsOffered')
+    .populate('skillsWanted');
 };
 
 // Search users with filters and pagination
 export const searchUsersService = async (filters) => {
-  const { skill, location, availability, page, limit } = filters;
+  const { name, location, availability, page, limit } = filters;
 
   let query = { isPublic: true, isBanned: { $ne: true } };
 
-  // Apply skill filter
-  if (skill) {
-    const skillRegex = new RegExp(skill, 'i');
+  // Apply name/location fuzzy search
+  if (name && location) {
     query.$or = [
-      { skillsOffered: { $in: [skillRegex] } },
-      { skillsWanted: { $in: [skillRegex] } }
+      { name: new RegExp(name, 'i') },
+      { location: new RegExp(location, 'i') }
     ];
-  }
-
-  // Apply location filter
-  if (location) {
+  } else if (name) {
+    query.name = new RegExp(name, 'i');
+  } else if (location) {
     query.location = new RegExp(location, 'i');
   }
 
@@ -94,7 +81,9 @@ export const searchUsersService = async (filters) => {
   const users = await User.find(query)
     .skip(skip)
     .limit(limit)
-    .sort({ lastActive: -1 });
+    .sort({ lastActive: -1 })
+    .populate('skillsOffered')
+    .populate('skillsWanted');
 
   const total = await User.countDocuments(query);
   const totalPages = Math.ceil(total / limit);
@@ -110,7 +99,9 @@ export const searchUsersService = async (filters) => {
 
 // Get user by ID
 export const getUserByIdService = async (userId) => {
-  return await User.findById(userId);
+  return await User.findById(userId)
+    .populate('skillsOffered')
+    .populate('skillsWanted');
 };
 
 // Get user feedback

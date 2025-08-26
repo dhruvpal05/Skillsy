@@ -161,7 +161,7 @@ const Dashboard = () => {
                     key={index}
                     className="bg-emerald-600/20 text-emerald-300 px-4 py-1 rounded-full text-sm font-medium shadow-sm border border-emerald-700/30"
                   >
-                    {skill}
+                    {skill.name || skill}
                   </span>
                 ))
               ) : (
@@ -182,7 +182,7 @@ const Dashboard = () => {
                     key={index}
                     className="bg-blue-600/20 text-blue-300 px-4 py-1 rounded-full text-sm font-medium shadow-sm border border-blue-700/30"
                   >
-                    {skill}
+                    {skill.name || skill}
                   </span>
                 ))
               ) : (
@@ -201,9 +201,9 @@ const Dashboard = () => {
                 <div key={swap._id} className="flex items-center justify-between p-4 bg-neutral-800/80 rounded-xl border border-neutral-700">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
-                      <span className="text-emerald-300 font-semibold">{swap.offeredSkill}</span>
+                      <span className="text-emerald-300 font-semibold">{swap.offeredSkill?.name || swap.offeredSkill}</span>
                       <span className="text-gray-500">↔</span>
-                      <span className="text-blue-300 font-semibold">{swap.requestedSkill}</span>
+                      <span className="text-blue-300 font-semibold">{swap.requestedSkill?.name || swap.requestedSkill}</span>
                     </div>
                     <p className="text-gray-400 text-xs mt-1">
                       {new Date(swap.createdAt).toLocaleDateString()}

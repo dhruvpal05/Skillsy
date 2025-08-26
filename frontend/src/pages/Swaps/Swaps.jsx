@@ -156,9 +156,9 @@ const handleFeedbackSubmit = async () => {
                       </div>
                       <div className="mb-4">
                         <div className="flex items-center text-lg">
-                          <span className="text-emerald-300 font-semibold">{swap.offeredSkill}</span>
+                          <span className="text-emerald-300 font-semibold">{swap.offeredSkill?.name || 'Unknown Skill'}</span>
                           <span className="text-gray-500 mx-2">↔</span>
-                          <span className="text-blue-300 font-semibold">{swap.requestedSkill}</span>
+                          <span className="text-blue-300 font-semibold">{swap.requestedSkill?.name || 'Unknown Skill'}</span>
                         </div>
                         <p className="text-gray-400 text-sm mt-1">
                           {activeTab === 'sent' ? 'Requested from' : 'Requested by'}: {
