@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import api from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { Edit, Save, X, Plus, Trash2, MapPin, Clock, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -13,10 +12,9 @@ const Profile = () => {
     location: '',
     availability: 'available',
     isPublic: true,
-    skillsOffered: [], // array of skill ObjectIds
-    skillsWanted: [],  // array of skill ObjectIds
+    skillsOffered: [],
+    skillsWanted: [],
   });
-  const [allSkills, setAllSkills] = useState([]); // all skill objects
   const [newSkillOffered, setNewSkillOffered] = useState('');
   const [newSkillWanted, setNewSkillWanted] = useState('');
 
@@ -27,52 +25,16 @@ const Profile = () => {
         location: user.location || '',
         availability: user.availability,
         isPublic: user.isPublic,
-        skillsOffered: Array.isArray(user.skillsOffered) ? user.skillsOffered : [],
-        skillsWanted: Array.isArray(user.skillsWanted) ? user.skillsWanted : [],
+        skillsOffered: [...user.skillsOffered],
+        skillsWanted: [...user.skillsWanted],
       });
     }
   }, [user]);
-
-  useEffect(() => {
-    // Fetch all skills for selection
-    const fetchSkills = async () => {
-      try {
-        const res = await api.get('/skills');
-        setAllSkills(res.data.skills || []);
-      } catch (err) {
-        toast.error('Failed to load skills');
-      }
-    };
-    fetchSkills();
-
-    // Log user profile response for debugging
-    const fetchUserProfile = async () => {
-      try {
-        const res = await api.get('/users/profile');
-        console.log('User profile response:', res.data);
-      } catch (err) {
-        console.log('Error fetching user profile:', err);
-      }
-    };
-    fetchUserProfile();
-  }, []);
 
   const handleSave = async () => {
     setLoading(true);
     try {
       await updateProfile(formData);
-      // Fetch latest user profile after update
-      const res = await api.get('/users/profile');
-      if (res.data && res.data.data) {
-        setFormData({
-          name: res.data.data.name,
-          location: res.data.data.location || '',
-          availability: res.data.data.availability,
-          isPublic: res.data.data.isPublic,
-          skillsOffered: res.data.data.skillsOffered ? res.data.data.skillsOffered.map(s => s._id || s) : [],
-          skillsWanted: res.data.data.skillsWanted ? res.data.data.skillsWanted.map(s => s._id || s) : [],
-        });
-      }
       setIsEditing(false);
     } catch (error) {
       // Error is handled in the context
@@ -95,118 +57,24 @@ const Profile = () => {
     setIsEditing(false);
   };
 
-  const addSkillOffered = async () => {
-    const skillName = newSkillOffered.trim();
-    if (!skillName) return;
-    let skillObj = allSkills.find(s => s.name && s.name.toLowerCase() === skillName.toLowerCase());
-    if (skillObj && formData.skillsOffered.includes(skillObj._id)) {
-      toast.error('Skill already added');
-      return;
+  const addSkillOffered = () => {
+    if (newSkillOffered.trim() && !formData.skillsOffered.includes(newSkillOffered.trim())) {
+      setFormData({
+        ...formData,
+        skillsOffered: [...formData.skillsOffered, newSkillOffered.trim()],
+      });
+      setNewSkillOffered('');
     }
-    if (!skillObj) {
-      // Create skill in backend
-      try {
-        const res = await api.post('/skills', { name: skillName });
-        skillObj = res.data.skill || res.data.data || res.data;
-        if (!skillObj || !skillObj._id) {
-          toast.error('Skill creation failed');
-          return;
-        }
-        setAllSkills([...allSkills, skillObj]);
-      } catch (err) {
-        // If skill already exists (409), use the existing skill
-        if (err.response && err.response.status === 409) {
-          // Fetch the skill from backend by name
-          try {
-            const res = await api.get('/skills');
-            const skills = res.data.skills || res.data.data || res.data;
-            setAllSkills(skills);
-            skillObj = Array.isArray(skills)
-              ? skills.find(s => s.name && s.name.toLowerCase() === skillName.toLowerCase())
-              : undefined;
-            if (!skillObj || !skillObj._id) {
-              toast.error('Skill already exists but could not be fetched');
-              return;
-            }
-          } catch (fetchErr) {
-            toast.error('Skill already exists but could not be fetched');
-            return;
-          }
-        } else {
-          toast.error('Failed to create skill');
-          return;
-        }
-      }
-    }
-    setFormData({
-  ...formData,
-  skillsOffered: [...formData.skillsOffered, skillObj],
-    });
-    setNewSkillOffered('');
-      // Always refresh allSkills after adding a skill
-      try {
-        const res = await api.get('/skills');
-        setAllSkills(res.data.skills || []);
-      } catch (err) {
-        // Optionally show a toast
-      }
   };
 
-  const addSkillWanted = async () => {
-    const skillName = newSkillWanted.trim();
-    if (!skillName) return;
-    let skillObj = allSkills.find(s => s.name && s.name.toLowerCase() === skillName.toLowerCase());
-    if (skillObj && formData.skillsWanted.includes(skillObj._id)) {
-      toast.error('Skill already added');
-      return;
+  const addSkillWanted = () => {
+    if (newSkillWanted.trim() && !formData.skillsWanted.includes(newSkillWanted.trim())) {
+      setFormData({
+        ...formData,
+        skillsWanted: [...formData.skillsWanted, newSkillWanted.trim()],
+      });
+      setNewSkillWanted('');
     }
-    if (!skillObj) {
-      // Create skill in backend
-      try {
-        const res = await api.post('/skills', { name: skillName });
-        skillObj = res.data.skill || res.data.data || res.data;
-        if (!skillObj || !skillObj._id) {
-          toast.error('Skill creation failed');
-          return;
-        }
-        setAllSkills([...allSkills, skillObj]);
-      } catch (err) {
-        // If skill already exists (409), use the existing skill
-        if (err.response && err.response.status === 409) {
-          // Fetch the skill from backend by name
-          try {
-            const res = await api.get('/skills');
-            const skills = res.data.skills || res.data.data || res.data;
-            setAllSkills(skills);
-            skillObj = Array.isArray(skills)
-              ? skills.find(s => s.name && s.name.toLowerCase() === skillName.toLowerCase())
-              : undefined;
-            if (!skillObj || !skillObj._id) {
-              toast.error('Skill already exists but could not be fetched');
-              return;
-            }
-          } catch (fetchErr) {
-            toast.error('Skill already exists but could not be fetched');
-            return;
-          }
-        } else {
-          toast.error('Failed to create skill');
-          return;
-        }
-      }
-    }
-    setFormData({
-  ...formData,
-  skillsWanted: [...formData.skillsWanted, skillObj],
-    });
-    setNewSkillWanted('');
-      // Always refresh allSkills after adding a skill
-      try {
-        const res = await api.get('/skills');
-        setAllSkills(res.data.skills || []);
-      } catch (err) {
-        // Optionally show a toast
-      }
   };
 
   const removeSkillOffered = (index) => {
@@ -389,9 +257,9 @@ const Profile = () => {
                 <div className="bg-neutral-900 rounded-2xl p-6 border border-neutral-800 shadow-lg">
                   <h3 className="text-lg font-semibold text-white mb-4">Skills I Offer</h3>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {formData.skillsOffered.map((skillObj, index) => (
+                    {formData.skillsOffered.map((skill, index) => (
                       <div key={index} className="flex items-center bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-sm">
-                        <span>{skillObj.name || 'Unknown Skill'}</span>
+                        <span>{skill}</span>
                         {isEditing && (
                           <button
                             onClick={() => removeSkillOffered(index)}
@@ -428,9 +296,9 @@ const Profile = () => {
                 <div className="bg-neutral-900 rounded-2xl p-6 border border-neutral-800 shadow-lg">
                   <h3 className="text-lg font-semibold text-white mb-4">Skills I Want to Learn</h3>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {formData.skillsWanted.map((skillObj, index) => (
+                    {formData.skillsWanted.map((skill, index) => (
                       <div key={index} className="flex items-center bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full text-sm">
-                        <span>{skillObj.name || 'Unknown Skill'}</span>
+                        <span>{skill}</span>
                         {isEditing && (
                           <button
                             onClick={() => removeSkillWanted(index)}

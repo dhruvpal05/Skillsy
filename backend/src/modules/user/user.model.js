@@ -7,8 +7,8 @@ const userSchema = new mongoose.Schema({
   passwordHash: { type: String, required: true },
   location: String,
   profilePhoto: String,
-    skillsOffered: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Skill' }],
-    skillsWanted: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Skill' }],
+   skillsOffered: [{ type: String }], // Changed from ObjectId to String array
+  skillsWanted: [{ type: String }], // Changed from ObjectId to String array
   availability: {
     type: String,
     enum: ['available', 'busy', 'offline'],

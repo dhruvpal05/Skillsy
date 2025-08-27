@@ -7,7 +7,6 @@ import {
 } from './swap.service.js';
 import { successResponse, errorResponse } from '../../utils/response.js';
 import User from '../user/user.model.js';
-import SwapRequest from './swap.model.js';
 
 export const sendSwapRequest = async (req, res) => {
   try {
@@ -18,28 +17,9 @@ export const sendSwapRequest = async (req, res) => {
       requestedSkill: req.body.requestedSkill,
       message: req.body.message
     };
-    // Check for existing pending swap request
-    const existing = await SwapRequest.findOne({
-      requesterId: data.requesterId,
-      targetUserId: data.targetUserId,
-      offeredSkill: data.offeredSkill,
-      requestedSkill: data.requestedSkill,
-      status: 'pending'
-    });
-    if (existing) {
-      console.log('Duplicate swap request blocked:', existing);
-      return errorResponse(res, 'A swap request for these skills is already pending between these users.', 409);
-    }
-    try {
-      const swap = await createSwapRequest(data);
-      return successResponse(res, swap, 'Swap request sent', 201);
-    } catch (creationError) {
-      console.error('Swap creation error:', creationError);
-      console.error('Payload:', data);
-      return errorResponse(res, creationError, 400);
-    }
+    const swap = await createSwapRequest(data);
+    return successResponse(res, swap, 'Swap request sent', 201);
   } catch (error) {
-    console.error('Swap request error:', error);
     return errorResponse(res, error, 400);
   }
 };
@@ -54,28 +34,9 @@ export const createSwapRequestController = async (req, res) => {
       requestedSkill: req.body.requestedSkill,
       message: req.body.message
     };
-    // Check for existing pending swap request
-    const existing = await SwapRequest.findOne({
-      requesterId: data.requesterId,
-      targetUserId: data.targetUserId,
-      offeredSkill: data.offeredSkill,
-      requestedSkill: data.requestedSkill,
-      status: 'pending'
-    });
-    if (existing) {
-      console.log('Duplicate swap request blocked:', existing);
-      return errorResponse(res, 'A swap request for these skills is already pending between these users.', 409);
-    }
-    try {
-      const swap = await createSwapRequest(data);
-      return successResponse(res, swap, 'Swap request created', 201);
-    } catch (creationError) {
-      console.error('Swap creation error:', creationError);
-      console.error('Payload:', data);
-      return errorResponse(res, creationError, 400);
-    }
+    const swap = await createSwapRequest(data);
+    return successResponse(res, swap, 'Swap request created', 201);
   } catch (error) {
-    console.error('Swap request error:', error);
     return errorResponse(res, error, 400);
   }
 };

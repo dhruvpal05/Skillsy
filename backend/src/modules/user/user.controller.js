@@ -66,36 +66,19 @@ export const logoutUser = (req, res) => {
 // Search users with filters and pagination
 export const searchUsers = async (req, res) => {
   try {
-    // Accept ?query=searchString or ?name=...&location=...
-    const { query, name, location, availability, page = 1, limit = 12 } = req.query;
+    const { skill, location, availability, page = 1, limit = 12 } = req.query;
 
-    let filters = {
-      page: parseInt(page),
-      limit: parseInt(limit),
+    const filters = {
+      skill: skill || null,
+      location: location || null,
       availability: availability || null,
-      location: null,
-      name: null
+      page: parseInt(page),
+      limit: parseInt(limit)
     };
 
-    // If query is present, use it for both name and location
-    if (query) {
-      filters.name = query;
-      filters.location = query;
-    } else {
-      if (name) filters.name = name;
-      if (location) filters.location = location;
-    }
-
-    try {
-      const result = await searchUsersService(filters);
-      return successResponse(res, result);
-    } catch (serviceError) {
-      console.error('searchUsersService error:', serviceError);
-      console.error('Filters:', filters);
-      return errorResponse(res, serviceError, 400);
-    }
+    const result = await searchUsersService(filters);
+    return successResponse(res, result);
   } catch (error) {
-    console.error('searchUsers controller error:', error);
     return errorResponse(res, error, 400);
   }
 };
