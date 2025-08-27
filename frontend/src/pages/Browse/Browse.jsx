@@ -49,6 +49,8 @@ const Browse = () => {
         } else if (user && user.id) {
           usersArray = usersArray.filter(u => u._id !== user.id && u.id !== user.id);
         }
+        // Filter out admin users
+        usersArray = usersArray.filter(u => !u.isAdmin);
         setUsers(usersArray);
       } catch (error) {
         toast.error('Failed to fetch users');

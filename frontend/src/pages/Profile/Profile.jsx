@@ -60,17 +60,41 @@ const Profile = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      await updateProfile(formData);
-      // Fetch latest user profile after update
-      const res = await api.get('/users/profile');
-      if (res.data && res.data.data) {
+      // Only send skill IDs to backend
+      const payload = {
+        ...formData,
+        skillsOffered: formData.skillsOffered.map(s => s._id),
+        skillsWanted: formData.skillsWanted.map(s => s._id),
+      };
+      await updateProfile(payload);
+      // Fetch latest skills and user profile after update
+      const [skillsRes, userRes] = await Promise.all([
+        api.get('/skills'),
+        api.get('/users/profile'),
+      ]);
+      const skillsList = skillsRes.data.skills || [];
+      if (userRes.data && userRes.data.data) {
+        // Map skill IDs or objects to skill objects from latest skills list
+        const offeredRaw = userRes.data.data.skillsOffered || [];
+        const wantedRaw = userRes.data.data.skillsWanted || [];
+        const offeredObjs = offeredRaw.map(item => {
+          if (item && item.name) return item; // already a skill object
+          const found = skillsList.find(s => s._id === (item._id || item));
+          return found || { _id: item._id || item, name: 'Unknown Skill' };
+        });
+        const wantedObjs = wantedRaw.map(item => {
+          if (item && item.name) return item;
+          const found = skillsList.find(s => s._id === (item._id || item));
+          return found || { _id: item._id || item, name: 'Unknown Skill' };
+        });
+        setAllSkills(skillsList);
         setFormData({
-          name: res.data.data.name,
-          location: res.data.data.location || '',
-          availability: res.data.data.availability,
-          isPublic: res.data.data.isPublic,
-          skillsOffered: res.data.data.skillsOffered ? res.data.data.skillsOffered.map(s => s._id || s) : [],
-          skillsWanted: res.data.data.skillsWanted ? res.data.data.skillsWanted.map(s => s._id || s) : [],
+          name: userRes.data.data.name,
+          location: userRes.data.data.location || '',
+          availability: userRes.data.data.availability,
+          isPublic: userRes.data.data.isPublic,
+          skillsOffered: offeredObjs,
+          skillsWanted: wantedObjs,
         });
       }
       setIsEditing(false);
