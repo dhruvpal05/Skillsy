@@ -69,7 +69,7 @@ export const getUserProfileService = async (userId) => {
 export const searchUsersService = async (filters) => {
   const { skill, location, availability, page, limit } = filters;
 
-  let query = { isPublic: true, isBanned: { $ne: true } };
+  let query = { isPublic: true };
 
   // Apply skill filter
   if (skill) {

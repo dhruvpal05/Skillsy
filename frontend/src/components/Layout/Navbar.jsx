@@ -41,7 +41,7 @@ const Navbar = () => {
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActive('/dashboard')
                       ? 'bg-emerald-500 text-white'
-                      : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                      : 'text-gray-300 hover:text-white hover:bg-neutral-800'
                   }`}
                 >
                   Dashboard
@@ -51,7 +51,7 @@ const Navbar = () => {
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
                     isActive('/browse')
                       ? 'bg-emerald-500 text-white'
-                      : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                      : 'text-gray-300 hover:text-white hover:bg-neutral-800'
                   }`}
                 >
                   <Search className="w-4 h-4" />
@@ -62,7 +62,7 @@ const Navbar = () => {
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
                     isActive('/swaps')
                       ? 'bg-emerald-500 text-white'
-                      : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                      : 'text-gray-300 hover:text-white hover:bg-neutral-800'
                   }`}
                 >
                   <MessageSquare className="w-4 h-4" />
@@ -73,7 +73,7 @@ const Navbar = () => {
                   className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
                     isActive('/profile')
                       ? 'bg-emerald-500 text-white'
-                      : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                      : 'text-gray-300 hover:text-white hover:bg-neutral-800'
                   }`}
                 >
                   <User className="w-4 h-4" />
@@ -85,7 +85,7 @@ const Navbar = () => {
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1 ${
                       isActive('/admin')
                         ? 'bg-emerald-500 text-white'
-                        : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                        : 'text-gray-300 hover:text-white hover:bg-neutral-800'
                     }`}
                   >
                     <Shield className="w-4 h-4" />
@@ -94,7 +94,7 @@ const Navbar = () => {
                 )}
                 <button
                   onClick={handleLogout}
-                  className="text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1"
+                  className="text-gray-300 hover:text-white hover:bg-neutral-800 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Logout</span>
@@ -104,7 +104,7 @@ const Navbar = () => {
               <>
                 <Link
                   to="/login"
-                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  className="text-gray-300 hover:text-white hover:bg-neutral-800 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   Login
                 </Link>
@@ -139,7 +139,7 @@ const Navbar = () => {
       </div>
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-neutral-950 border-t border-neutral-900 px-2 pt-2 pb-3 space-y-1">
+  <div className="md:hidden bg-neutral-950 border-t border-neutral-900 px-2 pt-2 pb-3 space-y-1">
           {user ? (
             <>
               <Link
@@ -147,7 +147,7 @@ const Navbar = () => {
                 className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
                   isActive('/dashboard')
                     ? 'bg-emerald-500 text-white'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                    : 'text-gray-300 hover:text-white hover:bg-neutral-800'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -158,7 +158,7 @@ const Navbar = () => {
                 className={`block px-3 py-2 rounded-md text-base font-medium transition-colors flex items-center space-x-1 ${
                   isActive('/browse')
                     ? 'bg-emerald-500 text-white'
-                    : 'text-gray-300 hover:text-white hover:bg-gray-700'
+                    : 'text-gray-300 hover:text-white hover:bg-neutral-800'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
               >
