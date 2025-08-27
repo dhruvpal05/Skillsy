@@ -5,7 +5,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin:"http://localhost:5173", // Use environment variable or default to '*'
+    origin:"https://skillsy-1.onrender.com", // Use environment variable or default to '*'
     credentials: true
 }));
 
