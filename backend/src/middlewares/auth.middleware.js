@@ -9,15 +9,19 @@ export const protect = async (req, res, next) => {
     try {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = await User.findById(decoded.id).select('-password');
+      console.log('Decoded JWT:', decoded); // Log decoded token
+      const user = await User.findById(decoded.id).select('-password');
+      console.log('User found by token:', user); // Log user lookup result
+      req.user = user;
       next();
     } catch (error) {
-      console.error('JWT error:', error); // Add this line
+      console.error('JWT error:', error);
       return errorResponse(res, 'Not authorized, token failed', 401);
     }
   }
 
   if (!token) {
+    console.warn('No token provided in Authorization header');
     return errorResponse(res, 'Not authorized, no token', 401);
   }
 };
