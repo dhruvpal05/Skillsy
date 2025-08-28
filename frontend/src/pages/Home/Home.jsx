@@ -129,12 +129,14 @@ const Home = () => {
           <p className="mt-4 text-lg leading-6 text-neutral-300">
             Join our community today and start learning new skills while sharing your expertise.
           </p>
-          <Link
-            to="/register"
-            className="mt-8 w-full inline-flex items-center justify-center px-8 py-3 border border-emerald-500 text-base font-bold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 hover:text-white sm:w-auto transition-colors shadow-lg"
-          >
-            Sign up for free
-          </Link>
+          {!user && (
+            <Link
+              to="/register"
+              className="mt-8 w-full inline-flex items-center justify-center px-8 py-3 border border-emerald-500 text-base font-bold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 hover:text-white sm:w-auto transition-colors shadow-lg"
+            >
+              Sign up for free
+            </Link>
+          )}
         </div>
       </div>
     </div>

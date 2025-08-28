@@ -6,7 +6,8 @@ import { Search, MapPin, Star, MessageCircle, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Browse = () => {
-   const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [skillFilter, setSkillFilter] = useState('');
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   // Store the actual ObjectId to send to backend
@@ -81,6 +82,14 @@ const Browse = () => {
 
   return (
     <div className="min-h-screen bg-neutral-950">
+      {user?.isBanned && (
+        <div className="max-w-2xl mx-auto text-center py-8">
+          <div className="bg-red-900/80 border border-red-700 rounded-xl p-6">
+            <h2 className="text-2xl font-bold text-red-400 mb-2">Your account is banned</h2>
+            <p className="text-gray-300">You are not allowed to send swap requests or interact with other users.</p>
+          </div>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-4xl font-extrabold text-white mb-4 tracking-tight">Browse Users</h1>
@@ -104,7 +113,7 @@ const Browse = () => {
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-500"></div>
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-400"></div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -173,10 +182,13 @@ const Browse = () => {
 
                 <button
                   onClick={() => {
-                    setSelectedUser(user);
-                    setShowSwapModal(true);
+                    if (!user?.isBanned) {
+                      setSelectedUser(user);
+                      setShowSwapModal(true);
+                    }
                   }}
-                  className="w-full flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors mt-2"
+                  className={`w-full flex items-center justify-center px-4 py-2 rounded-lg mt-2 transition-colors ${user?.isBanned ? 'bg-gray-700 text-gray-400 cursor-not-allowed' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}
+                  disabled={user?.isBanned}
                 >
                   <MessageCircle className="h-4 w-4 mr-2" />
                   Request Swap
@@ -195,65 +207,67 @@ const Browse = () => {
         {/* Swap Request Modal */}
         {showSwapModal && selectedUser && (
           <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
-            <div className="bg-neutral-900 rounded-2xl p-8 w-full max-w-md border border-neutral-800 shadow-2xl">
-              <h3 className="text-2xl font-extrabold text-white mb-6 tracking-tight">
-                Request Skill Swap with <span className="text-emerald-400">{selectedUser.name}</span>
-              </h3>
-              <div className="space-y-5">
-                <div>
-                  <label className="block text-sm font-semibold text-emerald-400 mb-2">
-                    Skill you want to offer
-                  </label>
-                  <select
-                    value={swapForm.offeredSkill}
-                    onChange={(e) => setSwapForm({ ...swapForm, offeredSkill: e.target.value })}
-                    className="w-full px-4 py-3 bg-neutral-800 border border-emerald-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow"
-                  >
-                    <option value="">Select a skill...</option>
-                    {user.skillsOffered.map((skillObj, index) => (
-                      <option key={index} value={skillObj._id} className="bg-neutral-900 text-white">
-                        {skillObj.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-emerald-400 mb-2">
-                    Skill you want to learn
-                  </label>
-                  <select
-                    value={swapForm.requestedSkill}
-                    onChange={(e) => setSwapForm({ ...swapForm, requestedSkill: e.target.value })}
-                    className="w-full px-4 py-3 bg-neutral-800 border border-emerald-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow"
-                  >
-                    <option value="">Select a skill...</option>
-                    {selectedUser.skillsOffered.map((skillObj, index) => (
-                      <option key={index} value={skillObj._id} className="bg-neutral-900 text-white">
-                        {skillObj.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex space-x-4 mt-8">
-                  <button
-                    onClick={handleSwapRequest}
-                    className="flex-1 bg-emerald-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-emerald-700 transition-colors shadow"
-                  >
-                    Send Request
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowSwapModal(false);
-                      setSelectedUser(null);
-                      setSwapForm({ offeredSkill: '', requestedSkill: '', message: '' });
-                    }}
-                    className="flex-1 bg-neutral-800 text-white px-4 py-3 rounded-lg font-bold border border-neutral-700 hover:bg-neutral-900 transition-colors shadow"
-                  >
-                    Cancel
-                  </button>
+            {!user?.isBanned && (
+              <div className="bg-neutral-900 rounded-2xl p-8 w-full max-w-md border border-neutral-800 shadow-2xl">
+                <h3 className="text-2xl font-extrabold text-white mb-6 tracking-tight">
+                  Request Skill Swap with <span className="text-emerald-400">{selectedUser.name}</span>
+                </h3>
+                <div className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-semibold text-emerald-400 mb-2">
+                      Skill you want to offer
+                    </label>
+                    <select
+                      value={swapForm.offeredSkill}
+                      onChange={(e) => setSwapForm({ ...swapForm, offeredSkill: e.target.value })}
+                      className="w-full px-4 py-3 bg-neutral-800 border border-emerald-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow"
+                    >
+                      <option value="">Select a skill...</option>
+                      {user.skillsOffered.map((skillObj, index) => (
+                        <option key={index} value={skillObj._id} className="bg-neutral-900 text-white">
+                          {skillObj.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-emerald-400 mb-2">
+                      Skill you want to learn
+                    </label>
+                    <select
+                      value={swapForm.requestedSkill}
+                      onChange={(e) => setSwapForm({ ...swapForm, requestedSkill: e.target.value })}
+                      className="w-full px-4 py-3 bg-neutral-800 border border-emerald-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow"
+                    >
+                      <option value="">Select a skill...</option>
+                      {selectedUser.skillsOffered.map((skillObj, index) => (
+                        <option key={index} value={skillObj._id} className="bg-neutral-900 text-white">
+                          {skillObj.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex space-x-4 mt-8">
+                    <button
+                      onClick={handleSwapRequest}
+                      className="flex-1 bg-emerald-600 text-white px-4 py-3 rounded-lg font-bold hover:bg-emerald-700 transition-colors shadow"
+                    >
+                      Send Request
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowSwapModal(false);
+                        setSelectedUser(null);
+                        setSwapForm({ offeredSkill: '', requestedSkill: '', message: '' });
+                      }}
+                      className="flex-1 bg-neutral-800 text-white px-4 py-3 rounded-lg font-bold border border-neutral-700 hover:bg-neutral-900 transition-colors shadow"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </div>
