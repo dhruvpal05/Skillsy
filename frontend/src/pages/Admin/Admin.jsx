@@ -123,7 +123,7 @@ const Admin = () => {
                   className={`py-2 px-1 border-b-2 font-semibold text-sm flex items-center transition-colors ${
                     activeTab === key
                       ? 'border-emerald-500 text-emerald-400'
-                      : 'border-transparent text-gray-400 hover:text-emerald-300 hover:border-emerald-500'
+                      : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-700'
                   }`}
                 >
                   <Icon className="h-4 w-4 mr-2" />
@@ -135,94 +135,55 @@ const Admin = () => {
         </div>
 
         {loading ? (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950">
+          <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-emerald-500"></div>
           </div>
         ) : (
           <div>
             {activeTab === 'users' && (
               <div className="space-y-6">
-                {/* Banned Users Section */}
-                {users.filter(u => u.isBanned).length > 0 && (
-                  <div>
-                    <h2 className="text-xl font-bold text-red-400 mb-4">Banned Users</h2>
-                    {users.filter(user => user.isBanned).map((user) => (
-                      <div key={user._id} className="bg-neutral-900 rounded-2xl p-6 border border-red-600 shadow-xl">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <div className="w-12 h-12 bg-neutral-800 border-2 border-red-600 rounded-full flex items-center justify-center mr-4 shadow-lg">
-                              <span className="text-red-400 font-bold text-xl">
-                                {user.name.charAt(0).toUpperCase()}
+                {users.map((user) => (
+                  <div key={user._id} className="bg-neutral-900 rounded-2xl p-6 border border-neutral-800 shadow-xl">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                          <span className="text-white font-bold text-xl">
+                            {user.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-white tracking-tight">{user.name}</h3>
+                          <p className="text-gray-400">{user.email}</p>
+                          <div className="flex items-center space-x-4 mt-1">
+                            <span className="text-sm text-gray-400">
+                              {user.totalSwaps} swaps | {user.rating.toFixed(1)} rating
+                            </span>
+                            {user.isAdmin && (
+                              <span className="px-2 py-1 bg-emerald-600/20 text-emerald-300 rounded-full text-xs font-semibold border border-emerald-700/30 shadow-sm">
+                                Admin
                               </span>
-                            </div>
-                            <div>
-                              <h3 className="text-lg font-bold text-white tracking-tight">{user.name}</h3>
-                              <p className="text-gray-400">{user.email}</p>
-                              <div className="flex items-center space-x-4 mt-1">
-                                <span className="text-sm text-gray-400">
-                                  {user.totalSwaps} swaps | {user.rating.toFixed(1)} rating
-                                </span>
-                                {user.isAdmin && (
-                                  <span className="px-2 py-1 bg-emerald-600/20 text-emerald-300 rounded-full text-xs font-semibold border border-emerald-700/30 shadow-sm">
-                                    Admin
-                                  </span>
-                                )}
-                                <span className="px-2 py-1 bg-red-600/20 text-red-300 rounded-full text-xs font-semibold border border-red-700/30 shadow-sm">
-                                  Banned
-                                </span>
-                              </div>
-                            </div>
+                            )}
+                            {user.isBanned && (
+                              <span className="px-2 py-1 bg-red-600/20 text-red-300 rounded-full text-xs font-semibold border border-red-700/30 shadow-sm">
+                                Banned
+                              </span>
+                            )}
                           </div>
-                          <button
-                            onClick={() => handleBanUser(user._id, true)}
-                            className="px-5 py-2 rounded-xl font-semibold shadow bg-emerald-600 hover:bg-emerald-700 text-white"
-                          >
-                            Unban
-                          </button>
                         </div>
                       </div>
-                    ))}
+                      <button
+                        onClick={() => handleBanUser(user._id, user.isBanned)}
+                        className={`px-5 py-2 rounded-xl font-semibold shadow transition-colors ${
+                          user.isBanned
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                            : 'bg-red-600 hover:bg-red-700 text-white'
+                        }`}
+                      >
+                        {user.isBanned ? 'Unban' : 'Ban'}
+                      </button>
+                    </div>
                   </div>
-                )}
-                {/* Active Users Section */}
-                {users.filter(u => !u.isBanned).length > 0 && (
-                  <div>
-                    <h2 className="text-xl font-bold text-emerald-400 mb-4">Active Users</h2>
-                    {users.filter(user => !user.isBanned).map((user) => (
-                      <div key={user._id} className="bg-neutral-900 rounded-2xl p-6 border border-neutral-800 shadow-xl">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
-                              <span className="text-white font-bold text-xl">
-                                {user.name.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
-                            <div>
-                              <h3 className="text-lg font-bold text-white tracking-tight">{user.name}</h3>
-                              <p className="text-gray-400">{user.email}</p>
-                              <div className="flex items-center space-x-4 mt-1">
-                                <span className="text-sm text-gray-400">
-                                  {user.totalSwaps} swaps | {user.rating.toFixed(1)} rating
-                                </span>
-                                {user.isAdmin && (
-                                  <span className="px-2 py-1 bg-emerald-600/20 text-emerald-300 rounded-full text-xs font-semibold border border-emerald-700/30 shadow-sm">
-                                    Admin
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleBanUser(user._id, false)}
-                            className="px-5 py-2 rounded-xl font-semibold shadow bg-red-600 hover:bg-red-700 text-white"
-                          >
-                            Ban
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                ))}
               </div>
             )}
             {activeTab === 'swaps' && (
@@ -235,9 +196,7 @@ const Admin = () => {
                           Swap between {swap.requester?.name || 'Unknown'} &amp; {swap.targetUser?.name || 'Unknown'}
                         </h3>
                         <p className="text-gray-400">Status: {swap.status}</p>
-                        <p className="text-gray-400">
-                          Skills: {swap.offeredSkill?.name || 'Unknown'} ↔ {swap.requestedSkill?.name || 'Unknown'}
-                        </p>
+                        <p className="text-gray-400">Skills: {swap.skillOffered} ↔ {swap.skillWanted}</p>
                       </div>
                     </div>
                   </div>
@@ -259,6 +218,7 @@ const Admin = () => {
                 ))}
               </div>
             )}
+
             {activeTab === 'actions' && (
               <div className="space-y-6">
                 {adminActions.map((action) => (

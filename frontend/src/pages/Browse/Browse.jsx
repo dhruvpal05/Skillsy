@@ -34,32 +34,28 @@ const Browse = () => {
   };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        console.log('Searching users with query:', searchQuery);
-        const response = await usersAPI.searchUsers(searchQuery);
-        console.log('Search response:', response.data);
-        let usersArray = [];
-        if (response.data && response.data.data && Array.isArray(response.data.data.data)) {
-          usersArray = response.data.data.data;
-        }
-        // Filter out the current user by _id or id
-        if (user && user._id) {
-          usersArray = usersArray.filter(u => u._id !== user._id && u.id !== user._id);
-        } else if (user && user.id) {
-          usersArray = usersArray.filter(u => u._id !== user.id && u.id !== user.id);
-        }
-        // Filter out admin users
-        usersArray = usersArray.filter(u => !u.isAdmin);
-        setUsers(usersArray);
-      } catch (error) {
-        toast.error('Failed to fetch users');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUsers();
-  }, [searchQuery, user]);
+  }, [searchQuery, skillFilter]);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await usersAPI.searchUsers(searchQuery, skillFilter);
+      // The backend response is { data: { data: [users], ... } }
+      let usersArray = Array.isArray(response.data.data?.data) ? response.data.data.data : [];
+      // Filter out the current user by _id or id
+      if (user && user._id) {
+        usersArray = usersArray.filter(u => u._id !== user._id && u.id !== user._id);
+      } else if (user && user.id) {
+        usersArray = usersArray.filter(u => u._id !== user.id && u.id !== user.id);
+      }
+      console.log('Fetched users (excluding self):', usersArray);
+      setUsers(usersArray);
+    } catch (error) {
+      toast.error('Failed to fetch users');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSwapRequest = async () => {
     if (!selectedUser || !swapForm.offeredSkill || !swapForm.requestedSkill) {
